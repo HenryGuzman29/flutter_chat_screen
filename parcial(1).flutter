@@ -1,0 +1,167 @@
+import 'package:flutter/material.dart';
+
+// es la difinicion  un widget para representar un mensaje de chat
+class ChatMessageWidget extends StatelessWidget {
+  // Sson la  Propiedades para almacenar el mensaje y la URL de la imagen del remitente
+  final String message;
+  final String imageUrl;
+
+  // Constructor que requiere el mensaje y la URL de la imagen
+  ChatMessageWidget({required this.message, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      // para espacio alrededor del contenido del widget
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // Alinea los elementos en la parte superior
+        children: [
+          // Widget para mostrar la imagen del remitente en un avatar circular
+          CircleAvatar(
+            backgroundImage: NetworkImage(imageUrl), // Carga la imagen desde la URL
+          ),
+          SizedBox(width: 10), // Agrega un espacio horizontal entre la imagen y el texto
+          Expanded(
+            child: Container(
+              // Contenedor para mostrar el mensaje de chat
+              decoration: BoxDecoration(
+                // Establece el color de fondo y redondea las esquinas del contenedor
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.all(10), // Agrega espacio de relleno dentro del contenedor
+              child: Text(
+                message, // Muestra el mensaje de chat
+                style: TextStyle(fontSize: 16), // Establece el tamaño de fuente del texto
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+mport 'package:flutter/material.dart';
+
+// Define un widget para un campo de entrada de texto
+class InputBoxWidget extends StatelessWidget {
+  final TextEditingController controller; // Controlador para manejar el texto ingresado
+
+  // Constructor que requiere un controlador de texto
+  InputBoxWidget({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller, // Asocia el controlador al campo de entrada de texto
+      decoration: InputDecoration(
+        hintText: 'Escribe un mensaje...', // Texto de sugerencia cuando el campo está vacío
+        border: OutlineInputBorder( // Establece el borde del campo de entrada
+          borderRadius: BorderRadius.circular(10), // Redondea las esquinas del borde
+        ),
+        filled: true, // Indica que el campo debe estar lleno
+        fillColor: Colors.white, // Establece el color de fondo del campo de entrada
+      ),
+    );
+  }
+}
+
+
+import 'package:flutter/material.dart';
+import 'widgets/chat_message_widget.dart'; // Inpoete el  nuestro widget personalizado para mensajes de chat
+import 'widgets/input_box_widget.dart'; //  nuestro widget personalizado para la caja de entrada de texto
+import 'widgets/send_button_widget.dart'; // Importe el widget personalizado para el botón de enviar
+
+void main() {
+  runApp(ChatApp()); // el runapp para correr  la aplicación
+}
+
+class ChatApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ChatScreen(), // lo use para  definir  pantalla principal como ChatScreen
+    );
+  }
+}
+
+class ChatScreen extends StatefulWidget {
+  @override
+  _ChatScreenState createState() => _ChatScreenState(); //  es para cerar el estado de la pantalla de chat
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _controller = TextEditingController(); // Controlador para la caja de texto
+  final List<Widget> _messages = []; //  hice una lista para almacenar los mensajes de chat
+
+  void _sendMessage() {
+    // Función para enviar un mensaje
+    if (_controller.text.isNotEmpty) { // Verifica que el mensaje no esté vacío
+      setState(() {
+        // Actualiza la interfaz para una mejor interaccion
+        _messages.add(ChatMessageWidget(
+          message: _controller.text, // Texto del mensaje
+          imageUrl: 'https://via.placeholder.com/150', // URL de una imagen de Google como avatar
+        ));
+        _controller.clear(); // Limpia la caja de texto después de enviar el mensaje
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Construye la interfaz de usuario
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat'), // Título de la pantalla
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            // Área que contiene los mensajes para tener una mejor intereccion 
+            child: ListView.builder(
+              itemCount: _messages.length, //  muestra Número de mensajes en la lista
+              itemBuilder: (context, index) {
+                return _messages[index]; // Muestra cada mensaje en la lista
+              },
+            ),
+          ),
+          Padding(
+            // es la parte que contiene la caja de texto y el botón de enviar
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  // entrada y salida de texto 
+                  child: InputBoxWidget(controller: _controller),
+                ),
+                SendButtonWidget(onPressed: _sendMessage), // Botón de enviar mensaje
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+import 'package:flutter/material.dart';
+
+class SendButtonWidget extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  SendButtonWidget({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.send),
+      color: Colors.blue,
+      onPressed: onPressed,
+    );
+  }
+}
+
